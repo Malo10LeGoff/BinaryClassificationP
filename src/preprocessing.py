@@ -28,7 +28,7 @@ def normalize_dataset(*, X_train, X_test, numerical_columns):
 
 def feature_selection(*, X_train, X_test):
 
-    pca = PCA(n_components=10)
+    pca = PCA(n_components=10, random_state=42)
 
     X_train_scaled_reduced = pca.fit_transform(X_train)
     X_test_scaled_reduced = pca.fit_transform(X_test)

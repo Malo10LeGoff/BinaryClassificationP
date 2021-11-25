@@ -44,7 +44,7 @@ X_train_scaled_reduced, X_test_scaled_reduced = feature_selection(
 
 
 ### Training
-model = RandomForestClassifier()
+model = RandomForestClassifier(random_state=42)
 model.fit(X_train_scaled_reduced, y_train)
 
 
