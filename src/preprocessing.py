@@ -30,30 +30,32 @@ def normalize_dataset(*, data):
     return data_scaled
 
 
-def feature_selection(*, data):
+def feature_selection(*, data, n_components):
     """
     Reduce the dimensionality of the data through Principal Component Analysis/
     :param data: data to reduce
+    :param n_components: number of components to keep
     :return: the reduced data
     """
-    pca = PCA(n_components=10, random_state=42)
+    pca = PCA(n_components=n_components, random_state=42)
 
     data_reduced = pca.fit_transform(data)
     return data_reduced
 
 
-def preprocess(*, data: pd.DataFrame, numerical_columns: List):
+def preprocess(*, data: pd.DataFrame, numerical_columns: List, n_components):
     """
     Preprocessing pipeline for our project.
     :param data: the data to process.
     :param numerical_columns: List of the data's column names which contain numerical values.
+    :param n_components: number of components to keep after feature reduction
     :return: processed data
 
     #TODO :(@minh tri)  Technically there could be inconsistencies in the preprocessing, because the feature selection and normalization are fitted to 2 different sets of data.
     """
     data = data[numerical_columns].values
     # Reduce dimensionality (PCA)
-    data_reduced = feature_selection(data=data)
+    data_reduced = feature_selection(data=data, n_components=n_components)
 
     # Normalize data
     data_reduced_scaled = normalize_dataset(data=data_reduced)
