@@ -10,17 +10,15 @@ from preprocessing import fill_na_values, normalize_dataset, feature_selection
 
 if __name__ == '__main__':
     ### Import the dataset
-    df = pd.read_csv("../data/kidney_disease.csv", sep=",")
+    df = pd.read_csv("../data/data_banknote_authentication.csv", sep=",")
+    n_components = 4
 
     ### Clean the missing values
-    category_columns, numerical_columns = get_num_cat_features(df=df)
-
-    print(type(category_columns))
+    category_columns, numerical_columns = get_num_cat_features(df=df.loc[:, df.columns != 'classification'])
 
     df = fill_na_values(
         df=df, category_columns=category_columns, numerical_columns=numerical_columns
     )
-
     y = df["classification"]
     x = df.drop(columns=["classification"])
 
@@ -30,8 +28,8 @@ if __name__ == '__main__':
     )
 
     # Preprocess the split
-    x_train_preprocessed = preprocess(data=x_train, numerical_columns=numerical_columns)
-    x_test_preprocessed = preprocess(data=x_test, numerical_columns=numerical_columns)
+    x_train_preprocessed = preprocess(data=x_train, numerical_columns=numerical_columns, n_components=n_components)
+    x_test_preprocessed = preprocess(data=x_test, numerical_columns=numerical_columns, n_components=n_components)
 
     ### Training
     model = RandomForestClassifier(random_state=42)
