@@ -25,11 +25,16 @@ def cross_val_model(ModelClass,
     """
     Cross validate a model agaisnt a given metric, returning the results
 
-    :param parameter_range:
     :param ModelClass: the model class to test
     :param dataset: The Dataset you want to test the model on
     :param labels: The true labels from the dataset
+    :param n_components: The number of dimensions to reduce the dataset to
+    :param numerical_columns: Name of the dataset's columns that contain numerical data
+    :param parameter_name: The name of the parameter to test
+    :param parameter_range: The parameters to evaluate the model on
     :param n_trials: The number of times you want to train the  model on the data per parameter value
+    :param test_size: the proportion of the dataset that should be used for the test set
+    :param metric: The metric to use to evaluate the model
     :param kwargs: keyword arguments to pass to the model
 
     :return:
@@ -89,6 +94,7 @@ def plot_trial(trial):
                             "range":str,
                             "results" : list},
                             ...],
+                        "metric" : function
     :return: None
     """
     trial_length = _calculate_trial_length(trial)
@@ -101,6 +107,7 @@ def plot_trial(trial):
         for parameter_setup in trial[model]["parameters"]:
             ax[count].set_title(model)
             ax[count].set_xlabel(parameter_setup["name"])
+            ax[count].set_ylabel(trial[model]["metric"].__name__)
             ax[count].boxplot(parameter_setup["results"], labels=parameter_setup["range"])
             ax[count].set_ylim([0.8, 1])
             count += 1
@@ -117,10 +124,11 @@ if __name__ == '__main__':
             "model_class": RandomForestClassifier,
             "parameters": [{
                 "name": "max_depth",
-                "range": list(range(1, 5)),
+                "range": list(range(1, 15)),
                 "results": None
             },
             ],
+            "metric": accuracy_score,
         }
     }
 
@@ -145,6 +153,7 @@ if __name__ == '__main__':
                                                                    numerical_columns=numerical_columns,
                                                                    parameter_name=parameter_setup["name"],
                                                                    parameter_range=parameter_setup["range"],
+                                                                   metric=trial[model]["metric"]
                                                                    )
             # Register the results in a dict
             parameter_setup["results"] = model_results
@@ -158,5 +167,6 @@ if __name__ == '__main__':
             "wb+") as trial_file:
         pickle.dump(trial, trial_file)
 
+    # Plots the trial
     fig, ax = plot_trial(trial)
     plt.show()
