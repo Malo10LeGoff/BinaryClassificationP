@@ -7,11 +7,20 @@ from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from evaluation import evaluate_model, conf_matrix
 from preprocessing import normalize_dataset, preprocess
 from utility_functions import get_num_cat_features
-from preprocessing import fill_na_values, normalize_dataset, feature_selection
+from preprocessing import fill_na_values, normalize_dataset
+import sys
 
 if __name__ == "__main__":
     ### Import the dataset
-    df = pd.read_csv("../data/data_banknote_authentication.csv", sep=",")
+
+    if str(sys.argv[1]) == "kidney_disease":
+        df = pd.read_csv("../data/kidney_disease.csv", sep=",")
+    if str(sys.argv[1]) == "data_banknote":
+        df = pd.read_csv("../data/data_banknote_authentication.csv", sep=",")
+    else:
+        raise (
+            "Check the name of the dataset you want to run in your command line arguments !"
+        )
 
     n_components = 4
 
@@ -64,6 +73,5 @@ if __name__ == "__main__":
     print("\n")
     print(f"confusion matrix : ")
     print(confusion_matrix)
-    print("\n")
     print(f"Accuracy : {accu}")
     print(f"F1-score : {f1score}")
