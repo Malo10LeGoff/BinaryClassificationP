@@ -56,10 +56,8 @@ def preprocess(
     """
     data = data[numerical_columns].values
 
-    # Reduce dimensionality (PCA)
-    data_reduced = feature_selection(data=data, n_components=n_components)
+    data_scaled = normalize_dataset(data=data)
 
-    # Normalize data
-    data_reduced_scaled = normalize_dataset(data=data_reduced)
+    data_reduced_scaled = feature_selection(data=data_scaled, n_components=n_components)
 
     return data_reduced_scaled

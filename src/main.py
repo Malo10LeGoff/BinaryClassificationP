@@ -3,7 +3,6 @@ import pandas as pd
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from evaluation import evaluate_model, conf_matrix
 from preprocessing import normalize_dataset, preprocess
 from utility_functions import get_num_cat_features
@@ -13,12 +12,13 @@ import sys
 if __name__ == "__main__":
     ### Import the dataset
 
-    if str(sys.argv[1]) == "kidney_disease":
-        df = pd.read_csv("../data/kidney_disease.csv", sep=",")
-    if str(sys.argv[1]) == "data_banknote":
-        df = pd.read_csv("../data/data_banknote_authentication.csv", sep=",")
-    else:
-        raise (
+    try:
+        if str(sys.argv[1]) == "kidney_disease":
+            df = pd.read_csv("../data/kidney_disease.csv", sep=",")
+        if str(sys.argv[1]) == "data_banknote":
+            df = pd.read_csv("../data/data_banknote_authentication.csv", sep=",")
+    except Exception as e:
+        print(
             "Check the name of the dataset you want to run in your command line arguments !"
         )
 
