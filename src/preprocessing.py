@@ -5,7 +5,7 @@ from typing import List
 
 
 def fill_na_values(
-        *, df: pd.DataFrame, category_columns: List, numerical_columns: List
+    *, df: pd.DataFrame, category_columns: List, numerical_columns: List
 ) -> pd.DataFrame:
     for column in df:
         if df[column].isnull().any():
@@ -50,10 +50,8 @@ def preprocess(*, data: pd.DataFrame, numerical_columns: List, n_components):
     :param numerical_columns: List of the data's column names which contain numerical values.
     :param n_components: number of components to keep after feature reduction
     :return: processed data
-
-    #TODO :(@minh tri)  Technically there could be inconsistencies in the preprocessing, because the feature selection and normalization are fitted to 2 different sets of data.
     """
-    data = data[numerical_columns].values
+    data = data.values
     # Reduce dimensionality (PCA)
     data_reduced = feature_selection(data=data, n_components=n_components)
 
