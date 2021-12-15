@@ -44,9 +44,7 @@ def feature_selection(*, data, n_components):
     return data_reduced
 
 
-def preprocess(
-    *, data: pd.DataFrame, numerical_columns: List, category_columns: List, n_components
-):
+def preprocess(*, data: pd.DataFrame, numerical_columns: List, n_components):
     """
     Preprocessing pipeline for our project.
     :param data: the data to process.

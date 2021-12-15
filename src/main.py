@@ -10,8 +10,8 @@ from preprocessing import fill_na_values, normalize_dataset
 import sys
 
 if __name__ == "__main__":
-    ### Import the dataset
 
+    ### Import the dataset
     try:
         if str(sys.argv[1]) == "kidney_disease":
             df = pd.read_csv("../data/kidney_disease.csv", sep=",")
@@ -22,7 +22,7 @@ if __name__ == "__main__":
             "Check the name of the dataset you want to run in your command line arguments !"
         )
 
-    n_components = 4
+    N_COMPONENTS = 4
 
     ### Clean the missing values
     category_columns, numerical_columns = get_num_cat_features(
@@ -46,14 +46,12 @@ if __name__ == "__main__":
     x_train_preprocessed = preprocess(
         data=x_train,
         numerical_columns=numerical_columns,
-        category_columns=category_columns,
-        n_components=n_components,
+        n_components=N_COMPONENTS,
     )
     x_test_preprocessed = preprocess(
         data=x_test,
         numerical_columns=numerical_columns,
-        category_columns=category_columns,
-        n_components=n_components,
+        n_components=N_COMPONENTS,
     )
 
     ### Training
