@@ -9,6 +9,8 @@ def evaluate_model(model, x_test, y_true, metric=accuracy_score):
     :param y_true: Ground truth
     :param metric: The metric to evaluate against. Takes y_pred and y_true and outputs a score
     :return: the result of the evaluation
+
+    @Writer : Stanislas de Charentenay
     """
     # get the model's predictions
     y_pred = model.predict(x_test)
@@ -17,6 +19,9 @@ def evaluate_model(model, x_test, y_true, metric=accuracy_score):
 
 
 def conf_matrix(model, x_test, y_true):
+    """
+    @Writer : Stanislas de Charentenay
+    """
     # calculate the model's confusion matrix
     y_pred = model.predict(x_test)
     return confusion_matrix(y_true, y_pred)

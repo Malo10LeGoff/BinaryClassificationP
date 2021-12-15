@@ -11,6 +11,9 @@ import sys
 
 if __name__ == "__main__":
 
+    """
+    @Writer : Malo Le Goff
+    """
     ### Import the dataset
     try:
         if str(sys.argv[1]) == "kidney_disease":
