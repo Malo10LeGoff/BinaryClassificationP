@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from typing import List
+import numpy as np
 
 
 def fill_na_values(
@@ -43,7 +44,9 @@ def feature_selection(*, data, n_components):
     return data_reduced
 
 
-def preprocess(*, data: pd.DataFrame, numerical_columns: List, n_components):
+def preprocess(
+    *, data: pd.DataFrame, numerical_columns: List, category_columns: List, n_components
+):
     """
     Preprocessing pipeline for our project.
     :param data: the data to process.
@@ -51,7 +54,8 @@ def preprocess(*, data: pd.DataFrame, numerical_columns: List, n_components):
     :param n_components: number of components to keep after feature reduction
     :return: processed data
     """
-    data = data.values
+    data = data[numerical_columns].values
+
     # Reduce dimensionality (PCA)
     data_reduced = feature_selection(data=data, n_components=n_components)
 
