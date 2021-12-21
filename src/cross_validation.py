@@ -1,6 +1,7 @@
 from typing import List
 
 import pandas as pd
+import math
 
 from evaluation import evaluate_model
 from sklearn.model_selection import train_test_split
@@ -9,16 +10,18 @@ import matplotlib.pyplot as plt
 
 from src.preprocessing import preprocess, fill_na_values
 from src.utility_functions import get_num_cat_features
+from preprocessing import data_cleaning
+
+
 
 
 def cross_val_model(ModelClass,
                     dataset,
                     labels,
-                    n_components,
                     numerical_columns: List,
                     parameter_name: str,
                     parameter_range: List,
-                    n_trials=30,
+                    n_trials=10,
                     test_size=0.33,
                     metric=accuracy_score,
                     **kwargs):
@@ -59,10 +62,8 @@ def cross_val_model(ModelClass,
             )
 
             # preprocess the data
-            x_train_preprocessed = preprocess(data=x_train, numerical_columns=numerical_columns,
-                                              n_components=n_components)
-            x_test_preprocessed = preprocess(data=x_test, numerical_columns=numerical_columns,
-                                             n_components=n_components)
+            x_train_preprocessed = preprocess(data=x_train, numerical_columns=numerical_columns)
+            x_test_preprocessed = preprocess(data=x_test, numerical_columns=numerical_columns)
 
             # Fit the model to the training data
             model.fit(x_train_preprocessed, y_train)
@@ -98,26 +99,37 @@ def plot_trial(trial):
     :return: None
     """
     trial_length = _calculate_trial_length(trial)
-    fig, ax = plt.subplots(ncols=1, nrows=trial_length)
+    fig, ax = plt.subplots(ncols=2, nrows=math.ceil(trial_length/2))
     # Quick and dirty bugfix
     if trial_length == 1:
         ax = [ax]
     count = 0
+    lin = 0
+    col = 0
     for model in trial:
         for parameter_setup in trial[model]["parameters"]:
-            ax[count].set_title(model)
-            ax[count].set_xlabel(parameter_setup["name"])
-            ax[count].set_ylabel(trial[model]["metric"].__name__)
-            ax[count].boxplot(parameter_setup["results"], labels=parameter_setup["range"])
-            ax[count].set_ylim([0.8, 1])
+            ax[lin][col].set_title(model,fontsize=5)
+            ax[lin][col].set_xlabel(parameter_setup["name"],fontsize=5)
+            ax[lin][col].set_ylabel(trial[model]["metric"].__name__,fontsize=5)
+            ax[lin][col].boxplot(parameter_setup["results"], labels=parameter_setup["range"])
+            ax[lin][col].set_ylim([0.8, 1])
+            ax[lin][col].tick_params(axis='both', which='major', labelsize=5)
             count += 1
+            lin+=1
+            if count==math.ceil(trial_length/2):
+                lin = 0
+                col += 1
     return fig, ax
 
 
 if __name__ == '__main__':
     from sklearn.ensemble import RandomForestClassifier
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.svm import SVC
+    from sklearn.neighbors import KNeighborsClassifier
     import pickle
     from datetime import datetime
+    import numpy as np
 
     trial = {
         "RandomForestClassifier": {
@@ -127,29 +139,82 @@ if __name__ == '__main__':
                 "range": list(range(1, 15)),
                 "results": None
             },
+            {
+                "name": "n_estimators",
+                "range": [10,50,100,200,400],
+                "results": None
+            },
+            ],
+            "metric": accuracy_score,
+        },
+        "LogisticRegression": {
+            "model_class": LogisticRegression,
+            "parameters": [{
+                "name": "C",
+                "range": list(np.logspace(-3, 3, 7)),
+                "results": None
+            },
+            ],
+            "metric": accuracy_score,
+        },
+        "SVC": {
+            "model_class": SVC,
+            "parameters": [{
+                "name": "C",
+                "range": [0.1, 1, 10, 100, 1000],
+                "results": None
+            },
+            {
+                "name": "kernel",
+                "range": ['rbf','linear','poly','sigmoid'],
+                "results": None
+            },
+            {
+                "name": "gamma",
+                "range": [1, 0.1, 0.01, 0.001, 0.0001],
+                "results": None
+            },
+            ],
+            "metric": accuracy_score,
+        },
+        "KNN": {
+            "model_class": KNeighborsClassifier,
+            "parameters": [{
+                "name": "n_neighbors",
+                "range": [3, 6, 10, 15, 20, 30],
+                "results": None
+            },
+            {
+                "name": "metric",
+                "range": ['euclidean', 'minkowski'],
+                "results": None
+            },
+            {
+                "name": "weights",
+                "range": ['uniform','distance'],
+                "results": None
+            },
             ],
             "metric": accuracy_score,
         }
     }
 
     # Import the dataset
-    df = pd.read_csv("../data/data_banknote_authentication.csv", sep=",")
-    n_components = 4
+    df = pd.read_csv("../data/kidney_disease.csv", sep=",")
 
-    # Clean the missing values
-    category_columns, numerical_columns = get_num_cat_features(df=df.loc[:, df.columns != 'classification'])
+    df, category_columns, numerical_columns = data_cleaning(df)
 
-    df = fill_na_values(
-        df=df, category_columns=category_columns, numerical_columns=numerical_columns
+    x = pd.get_dummies(df.drop(columns=["classification"]))
+    y = df["classification"].apply(lambda x: 1 if x == "ckd" or x == 1 else 0)
+    ### Split the dataset
+    x_train, x_test, y_train, y_test = train_test_split(
+        x, y, test_size=0.33, random_state=42
     )
-    y = df["classification"]
-    x = df.drop(columns=["classification"])
     for model in trial:
         for parameter_setup in trial[model]["parameters"]:
             model_parameter_range, model_results = cross_val_model(ModelClass=trial[model]["model_class"],
                                                                    dataset=x,
                                                                    labels=y,
-                                                                   n_components=n_components,
                                                                    numerical_columns=numerical_columns,
                                                                    parameter_name=parameter_setup["name"],
                                                                    parameter_range=parameter_setup["range"],
@@ -158,7 +223,7 @@ if __name__ == '__main__':
             # Register the results in a dict
             parameter_setup["results"] = model_results
 
-    print(trial)
+
 
     # Save results and parameter ranges
     date = datetime.now()
@@ -169,4 +234,19 @@ if __name__ == '__main__':
 
     # Plots the trial
     fig, ax = plot_trial(trial)
+    plt.subplots_adjust(left=0.1,
+                        bottom=0.1,
+                        right=0.9,
+                        top=0.9,
+                        wspace=0.4,
+                        hspace=0.8)
     plt.show()
+
+    with np.printoptions(precision=2, floatmode="fixed"):
+        for model, model_param in trial.items():
+            print(f"{model:<15}")
+            for parameter_dict in model_param['parameters']:
+                print(f"{parameter_dict['name']:>15}")
+                for i in range(len(parameter_dict['range'])):
+                    print(f"{parameter_dict['range'][i]:>20}: median accuracy = {np.median(parameter_dict['results'][i])}")
+
