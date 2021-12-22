@@ -9,6 +9,11 @@ from preprocessing import normalize_dataset, preprocess
 from preprocessing import data_cleaning
 
 if __name__ == '__main__':
+    
+    """
+    @Writer : Malo Le Goff
+    """
+    
     ### Import the dataset
     df = pd.read_csv("../data/data_banknote_authentication.csv", sep=",")
 
