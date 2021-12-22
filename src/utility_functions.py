@@ -5,13 +5,20 @@ import math
 
 
 def get_num_cat_features(*, df: pd.DataFrame) -> List:
+    """
+    @Writer : Loic Turounet
+    """
 
     category_columns = df.select_dtypes(include=["object"]).columns.tolist()
     integer_columns = df.select_dtypes(include=["int64", "float64"]).columns.tolist()
     return category_columns, integer_columns
 
 def is_float(value):
-    """ Returns True is string is a float. """
+    """ 
+    Returns True if string contains a float. 
+    
+    @Writer : Loic Turounet
+    """
     try:
         val = float(value)
         return not math.isnan(val)
@@ -19,7 +26,11 @@ def is_float(value):
         return False
 
 def is_integer(value):
-    """ Returns True is string is an integer. """
+    """ 
+    Returns True if string contains an integer. 
+    
+    @Writer : Loic Turounet
+    """
     try:
         val = int(value)
         return not math.isnan(val)
@@ -27,7 +38,10 @@ def is_integer(value):
         return False
 
 def switch_from_cat_to_num(df, numerical_columns, category_columns):
-    """ Switches feature from category columns to numerical columns if first the two strings of the column contain an integer or a float. """
+    """ 
+    Switches feature from category columns to numerical columns if first the two strings of the column contain an integer or a float. 
+    @Writer : Loic Turounet
+    """
     switching_columns = []
     for col in category_columns:
         if is_float(df[col][0]) or is_integer(df[col][0]) or is_float(df[col][1]) or is_integer(df[col][1]):
@@ -38,7 +52,10 @@ def switch_from_cat_to_num(df, numerical_columns, category_columns):
     return category_columns, numerical_columns, switching_columns
 
 def drop_id(df):
-    """ Drops 'id' feature useless for the prediction """
+    """ 
+    Drops 'id' feature useless for the prediction 
+    @Writer : Loic Turounet
+    """
     if 'id' in df.columns:
         df = df.drop(columns=["id"])
     return df
