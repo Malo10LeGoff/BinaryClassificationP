@@ -45,6 +45,8 @@ def cross_val_model(ModelClass,
             The range of parameters the model was tested on and
         results :
             A len(parameter_range) x n_trials list containing the results of each trial run for each parameter value
+            
+     @Writer : Minh Tri Truong
     """
     results = []
     for parameter in parameter_range:
